@@ -125,4 +125,222 @@ increase opacities, blur, and spacings; sticky title bar. - **Breakpoint
 
 ## 6) Controls & States
 
-... (rest of doc omitted for brevity)
+### Buttons
+
+-   **Default**: `--button-bg-color` (α .15), 1px `--border-color`,
+    radius 6px (8--10px on mobile).
+-   **Hover**: `--button-hover-bg-color` (α .30), border α \~.40.
+-   **Active (touch)**: slight scale (0.95--0.98) and maintain hover
+    fill.
+-   **Text**: `--text-color`, weight 500, 12--18px padding depending on
+    context.
+
+### Inputs
+
+-   **Text**: Full width, 12px padding, fill `rgba(255,255,255,.05)`,
+    1px `--border-color`, radius 6px.
+-   **File**: Slightly higher α (0.08 default, 0.12 hover). Custom file
+    button uses α .25 / .40 on hover.
+
+### Tabs / Segmented controls
+
+-   **Container**: `--section-bg-color` with 4--6px padding, radius 8px.
+-   **Item**: Default muted text; **active** uses `--accent-color` text
+    and `--button-hover-bg-color` fill.
+
+### Radios (visual)
+
+-   Hide native input; styled labels become segments. Checked state
+    mirrors Tab active fill.
+
+------------------------------------------------------------------------
+
+## 7) Components (spec)
+
+### Title Bar
+
+-   Flex row, space-between; backdrop blur 20px (25px mobile); sticky on
+    mobile; bottom hairline.
+-   Logo 64px (desktop), 52px (tablet), 26px (XS), radius 4--6px.
+-   Title 16px/18px, 500.
+
+### Main Container
+
+-   Column flex wrapper; acrylic pane with blur 10px; radius 12px; 1px
+    border; overflow hidden.
+
+### Sidebar
+
+-   350px fixed width; vertical stack with 20px padding; right border;
+    acrylic fill α .05; blur 10px.
+
+### Content Area
+
+-   Flexible column; 20px padding; scrollable.
+
+### Sections
+
+-   Used for grouped controls; fill α .05--.08; blur 10px; radius
+    8--12px; 1px border α .10--.15; 15--18px padding.
+
+### Status Log
+
+-   Fixed height 250px (180px mobile), monospaced 13px; success/error
+    color accents.
+
+### Progress Bar
+
+-   Track: `--section-bg-color`, 6--12px height; Bar:
+    `--text-muted-color`.
+
+### Search Results Item
+
+-   Horizontal media object; 10--18px padding; 8--12px radius; album art
+    50--75px with 4--6px radius; title 500; artist muted 12--14px.
+
+### Footer
+
+-   Floating at bottom-right; small (11--12px) muted text; acrylic chip
+    on mobile.
+
+------------------------------------------------------------------------
+
+## 8) Motion & Interaction
+
+-   **State transitions**: `transition: all .2s–.3s ease` across
+    interactive elements.
+-   **Mobile tap feedback**: scale to 0.95--0.98 on press.
+-   Prefer **subtle motion**; avoid large shadows or long easings on
+    glass.
+-   (Optional) Add
+    `@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }`
+    in new projects for accessibility.
+
+------------------------------------------------------------------------
+
+## 9) Accessibility & Contrast
+
+-   Aim for **4.5:1** on primary text; use higher α backgrounds (≥.08)
+    behind small text over busy photos.
+-   Reserve pure white (`--accent-color`) for active states & key text
+    only.
+-   Increase control sizes on touch (≥44px target); already tuned at
+    ≤768px.
+
+------------------------------------------------------------------------
+
+## 10) Implementation Checklist (new project)
+
+1)  Import Satoshi; define tokens from §2.
+2)  Set `body` background image (dark, high-res), fixed & cover; base
+    text color to `--text-color`.
+3)  Create acrylic panes: container, title bar, sidebar, sections with
+    blurs per §4.
+4)  Implement controls: buttons, inputs, segmented controls;
+    hover/active states.
+5)  Apply layout: 1200px max width, 20px paddings, 12--20px gaps, 350px
+    sidebar.
+6)  Add responsive rules at 768px and 480px with opacity/blur/spacing
+    adjustments.
+7)  Validate contrast; tune background α where needed.
+
+------------------------------------------------------------------------
+
+## 11) Code Snippets (starter)
+
+**Reset & page**
+
+``` css
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { font: 14px 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--text-color); }
+```
+
+**Acrylic utility**
+
+``` css
+.glass-10 { background: rgba(255,255,255,.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.glass-20 { background: rgba(12,12,13,.10);  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+.border-1 { border: 1px solid var(--border-color); }
+.rad-6 { border-radius: 6px; } .rad-8 { border-radius: 8px; } .rad-12 { border-radius: 12px; }
+```
+
+**Button**
+
+``` css
+.btn { background: var(--button-bg-color); color: var(--text-color); border: 1px solid var(--border-color);
+       border-radius: 6px; padding: 12px 18px; font: 500 14px 'Satoshi', sans-serif; transition: all .2s ease; }
+.btn:hover { background: var(--button-hover-bg-color); border-color: rgba(151,177,185,.4); }
+.btn:active { transform: scale(.98); }
+```
+
+**Segmented control**
+
+``` css
+.segmented { display:flex; gap:4px; padding:4px; border-radius:8px; background: var(--section-bg-color); }
+.segmented .item { flex:1; text-align:center; padding:8px; color: var(--text-muted-color); border-radius:6px; }
+.segmented .item.is-active { color: var(--accent-color); background: var(--button-hover-bg-color); }
+```
+
+**Inputs**
+
+``` css
+.input { width:100%; padding:12px; background: rgba(255,255,255,.05); border:1px solid var(--border-color);
+         border-radius:6px; color: var(--text-color); font: 14px 'Satoshi', sans-serif; }
+```
+
+**Breakpoints**
+
+``` css
+@media (max-width: 768px){
+  .title-bar{ backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding:15px 20px; }
+  .btn, .input { border-radius:10px; }
+}
+@media (max-width: 480px){
+  .title-bar .logo{ width:26px; height:26px; }
+}
+```
+
+------------------------------------------------------------------------
+
+## 12) Naming & File Organization
+
+-   `tokens.css` -- variables, utilities.
+-   `layout.css` -- core structure (container, sidebar, content, title
+    bar).
+-   `components.css` -- buttons, inputs, tabs, progress, cards.
+-   `responsive.css` -- media queries for ≤768px and ≤480px.
+
+------------------------------------------------------------------------
+
+## 13) Theming Knobs (safe to vary)
+
+-   **Background image**: swap per project; keep dark and low-detail
+    behind text.
+-   **Accent intensity**: tweak `--button-*` alphas ±0.05 to match
+    photography.
+-   **Blur**: 8--12px for content panes; 18--24px for headers.
+-   **Radius**: remain within 6--12px family.
+
+------------------------------------------------------------------------
+
+## 14) Do / Don't
+
+**Do** - Keep borders hairline and neutral. - Use muted text for
+secondary info. - Increase opacity behind dense text blocks.
+
+**Don't** - Stack multiple translucent layers without adequate
+contrast. - Use saturated accent colors over busy photos. - Rely on
+heavy shadows to imply depth.
+
+------------------------------------------------------------------------
+
+### Quick Start (copy into new project)
+
+1.  Copy §2 tokens and import Satoshi.
+2.  Add §11 utilities.
+3.  Build panes and controls per §4--§7.
+
+That's it---you'll get the same acrylic, frosted‑glass character with
+consistent spacing, radii, blurs, and muted palette.
+
